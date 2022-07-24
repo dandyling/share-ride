@@ -14,12 +14,14 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";
+import md5 from "md5";
 
 interface Location {
   address: string;
   time: string;
 }
 interface RideOffer {
+  id: string;
   name: string;
   email: string;
   phoneNumber: string;
@@ -36,6 +38,7 @@ interface RideOffer {
 
 const rideOffers: RideOffer[] = [
   {
+    id: "id1",
     uid: "xx1",
     name: "John Doe",
     email: "johndoe@gmail.com",
@@ -47,6 +50,7 @@ const rideOffers: RideOffer[] = [
     dropoffLocations: [{ address: "Lita Tyre", time: "11:00" }],
   },
   {
+    id: "id2",
     uid: "xx2",
     name: "Jane Kim",
     email: "johndoe@gmail.com",
@@ -58,7 +62,8 @@ const rideOffers: RideOffer[] = [
     dropoffLocations: [{ address: "Lita Tyre", time: "11:00" }],
   },
   {
-    uid: "xx2",
+    id: "id3",
+    uid: "xx3",
     name: "Feline Ling",
     email: "johndoe@gmail.com",
     phoneNumber: "+60164905276",
@@ -134,16 +139,16 @@ const Home: NextPage = () => {
           </div>
           <div className="flex flex-col">
             {rideOffers.map((rideOffer) => {
-              const { name, pickupLocations, dropoffLocations } = rideOffer;
+              const { name, pickupLocations, dropoffLocations, id } = rideOffer;
               return (
-                <Card className="border-t-2 space-y-2 py-8">
+                <Card className="border-t-2 space-y-2 py-8" key={id}>
                   <Title className="text-center text-ferra" order={3}>
                     {name}
                   </Title>
                   {pickupLocations.map((location) => {
                     const { address, time } = location;
                     return (
-                      <div className="flex flex-col">
+                      <div className="flex flex-col" key={md5(address + time)}>
                         <Text className="text-lg font-medium">Pickup</Text>
                         <div className="flex justify-between text-stone-500">
                           <Text>{address}</Text>
@@ -155,7 +160,7 @@ const Home: NextPage = () => {
                   {dropoffLocations.map((location) => {
                     const { address, time } = location;
                     return (
-                      <div className="flex flex-col">
+                      <div className="flex flex-col" key={md5(address + time)}>
                         <Text className="text-lg font-medium">Dropoff</Text>
                         <div className="flex justify-between text-stone-500">
                           <Text>{address}</Text>
