@@ -8,11 +8,67 @@ import {
   Footer,
   Burger,
   Title,
+  Card,
 } from "@mantine/core";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";
+
+interface Location {
+  address: string;
+  time: string;
+}
+interface RideOffer {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  photoUrl: string;
+  pickupDate: string;
+  status: "active" | "archived" | "paused";
+  pickupLocations: Location[];
+  dropoffLocations: Location[];
+  uid: string;
+  price?: number;
+  brand?: string;
+  model?: string;
+}
+
+const rideOffers: RideOffer[] = [
+  {
+    uid: "xx1",
+    name: "John Doe",
+    email: "johndoe@gmail.com",
+    phoneNumber: "+60164905276",
+    photoUrl: "https://randomuser.me/",
+    pickupDate: "2022-07-24",
+    status: "active",
+    pickupLocations: [{ address: "Ideal One Foresta", time: "10:00" }],
+    dropoffLocations: [{ address: "Lita Tyre", time: "11:00" }],
+  },
+  {
+    uid: "xx2",
+    name: "Jane Kim",
+    email: "johndoe@gmail.com",
+    phoneNumber: "+60164905276",
+    photoUrl: "https://randomuser.me/",
+    pickupDate: "2022-07-24",
+    status: "active",
+    pickupLocations: [{ address: "Ideal One Foresta", time: "10:00" }],
+    dropoffLocations: [{ address: "Lita Tyre", time: "11:00" }],
+  },
+  {
+    uid: "xx2",
+    name: "Feline Ling",
+    email: "johndoe@gmail.com",
+    phoneNumber: "+60164905276",
+    photoUrl: "https://randomuser.me/",
+    pickupDate: "2022-07-24",
+    status: "active",
+    pickupLocations: [{ address: "Ideal One Foresta", time: "10:00" }],
+    dropoffLocations: [{ address: "Lita Tyre", time: "11:00" }],
+  },
+];
 
 const Home: NextPage = () => {
   const [opened, setOpened] = useState(false);
@@ -53,7 +109,7 @@ const Home: NextPage = () => {
                   mr="xl"
                 />
               </MediaQuery>
-              <Text>Share your ride</Text>
+              <Text>Find a ride through carpool</Text>
             </div>
           </Header>
         }
@@ -68,11 +124,54 @@ const Home: NextPage = () => {
             layout="responsive"
             objectFit="cover"
           />
-          <div className="p-4 space-y-4">
+          <div className="p-4 space-y-2 ">
             <Title order={1} className="text-ferra">
-              ShareRide - Share your ride with others
+              Find a ride
             </Title>
-            <Text>Start by sharing your rides with others</Text>
+            <Text className="text-ferra">
+              Find a carpool by going through the list below
+            </Text>
+          </div>
+          <div className="flex flex-col">
+            {rideOffers.map((rideOffer) => {
+              const { name, pickupLocations, dropoffLocations } = rideOffer;
+              return (
+                <Card className="border-t-2 space-y-2 py-8">
+                  <Title className="text-center text-ferra" order={3}>
+                    {name}
+                  </Title>
+                  {pickupLocations.map((location) => {
+                    const { address, time } = location;
+                    return (
+                      <div className="flex flex-col">
+                        <Text className="text-lg font-medium">Pickup</Text>
+                        <div className="flex justify-between text-stone-500">
+                          <Text>{address}</Text>
+                          <Text>{time}</Text>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {dropoffLocations.map((location) => {
+                    const { address, time } = location;
+                    return (
+                      <div className="flex flex-col">
+                        <Text className="text-lg font-medium">Dropoff</Text>
+                        <div className="flex justify-between text-stone-500">
+                          <Text>{address}</Text>
+                          <Text>{time}</Text>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="flex justify-center">
+                    <Button size="lg" className="bg-primary my-1">
+                      Message
+                    </Button>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </AppShell>
