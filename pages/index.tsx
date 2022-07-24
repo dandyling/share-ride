@@ -24,6 +24,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <AppShell
+        padding={0}
         navbarOffsetBreakpoint="sm"
         fixed
         navbar={
@@ -57,11 +58,23 @@ const Home: NextPage = () => {
           </Header>
         }
       >
-        <Image src="/carpool-friends.svg" width="300" height="400" />
-        <Title order={1} className="text-sky-400">
-          ShareRide - Share your ride with others
-          <Button>Book now</Button>
-        </Title>
+        <div className="flex flex-col h-full">
+          {/* Next image width and height are ratios of the image dimensions.
+          Use responsive in conjunction with cover */}
+          <Image
+            src="/carpool-friends.svg"
+            width={16}
+            height={9}
+            layout="responsive"
+            objectFit="cover"
+          />
+          <div className="p-4 space-y-4">
+            <Title order={1} className="text-ferra">
+              ShareRide - Share your ride with others
+            </Title>
+            <Text>Start by sharing your rides with others</Text>
+          </div>
+        </div>
       </AppShell>
     </div>
   );
