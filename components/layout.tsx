@@ -8,6 +8,7 @@ import {
   Navbar,
   Text,
 } from "@mantine/core";
+import Link from "next/link";
 import { ReactNode, useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { TbSteeringWheel } from "react-icons/tb";
@@ -17,21 +18,25 @@ export const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <AppShell
       padding={0}
-      navbarOffsetBreakpoint="sm"
+      navbarOffsetBreakpoint="lg"
       fixed
       navbar={
-        <Navbar className="p-4 sm:w-72" hiddenBreakpoint="sm" hidden={!opened}>
+        <Navbar className="p-4 sm:w-72" hiddenBreakpoint="lg" hidden={!opened}>
           <Text>Application Navbar</Text>
         </Navbar>
       }
       footer={
         <Footer className="flex items-center justify-around p-4" height={64}>
-          <ActionIcon>
-            <FaUser className="text-2xl" />
-          </ActionIcon>
-          <ActionIcon>
-            <TbSteeringWheel className="text-2xl" />
-          </ActionIcon>
+          <Link href="/">
+            <ActionIcon>
+              <FaUser className="text-2xl" />
+            </ActionIcon>
+          </Link>
+          <Link href="/offer-ride">
+            <ActionIcon>
+              <TbSteeringWheel className="text-2xl" />
+            </ActionIcon>
+          </Link>
         </Footer>
       }
       header={

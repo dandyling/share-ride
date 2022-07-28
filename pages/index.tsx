@@ -5,7 +5,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { Layout } from "../components/layout";
 
-interface Location {
+export interface Location {
   address: string;
   time: string;
 }
@@ -83,7 +83,7 @@ const Home: NextPage = () => {
             layout="responsive"
             objectFit="cover"
           />
-          <div className="p-4 space-y-2 ">
+          <div className="p-4 space-y-2">
             <Title order={1} className="text-ferra">
               Find a ride
             </Title>
