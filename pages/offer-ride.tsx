@@ -2,10 +2,12 @@ import { ActionIcon, Button, TextInput, Title } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import dayjs from "dayjs";
+import { addDoc, collection } from "firebase/firestore";
 import { NextPage } from "next";
 import { useState } from "react";
 import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { Layout } from "../components/layout";
+import { firestore } from "../firebase/firebase";
 import { Location } from "./index";
 
 const OfferRide: NextPage = () => {
@@ -35,8 +37,9 @@ const OfferRide: NextPage = () => {
       <div className="p-4">
         <form
           className="space-y-4"
-          onSubmit={onSubmit((values) => {
-            console.log({ ...values, pickupLocations, dropoffLocations });
+          onSubmit={onSubmit(async (values) => {
+            const data = { ...values, pickupLocations, dropoffLocations };
+            await addDoc(collection(firestore, "rideOffers"), data);
           })}
         >
           <DatePicker

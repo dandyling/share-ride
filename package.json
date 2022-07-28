@@ -16,6 +16,7 @@
     "@mantine/next": "^4.2.12",
     "@mantine/notifications": "^4.2.12",
     "dayjs": "^1.11.4",
+    "firebase": "^9.9.1",
     "md5": "^2.3.0",
     "next": "12.2.3",
     "react": "18.2.0",
