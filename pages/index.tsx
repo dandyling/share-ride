@@ -1,9 +1,12 @@
 import { Button, Card, Text, Title } from "@mantine/core";
+import { query, collection, getDocs } from "firebase/firestore";
 import md5 from "md5";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { Layout } from "../components/layout";
+import { firestore } from "../firebase/firebase";
 
 export interface Location {
   address: string;
@@ -25,46 +28,25 @@ interface RideOffer {
   model?: string;
 }
 
-const rideOffers: RideOffer[] = [
-  {
-    id: "id1",
-    uid: "xx1",
-    name: "John Doe",
-    email: "johndoe@gmail.com",
-    phoneNumber: "+60164905276",
-    photoUrl: "https://randomuser.me/",
-    pickupDate: "2022-07-24",
-    status: "active",
-    pickupLocations: [{ address: "Ideal One Foresta", time: "10:00" }],
-    dropoffLocations: [{ address: "Lita Tyre", time: "11:00" }],
-  },
-  {
-    id: "id2",
-    uid: "xx2",
-    name: "Jane Kim",
-    email: "johndoe@gmail.com",
-    phoneNumber: "+60164905276",
-    photoUrl: "https://randomuser.me/",
-    pickupDate: "2022-07-24",
-    status: "active",
-    pickupLocations: [{ address: "Ideal One Foresta", time: "10:00" }],
-    dropoffLocations: [{ address: "Lita Tyre", time: "11:00" }],
-  },
-  {
-    id: "id3",
-    uid: "xx3",
-    name: "Feline Ling",
-    email: "johndoe@gmail.com",
-    phoneNumber: "+60164905276",
-    photoUrl: "https://randomuser.me/",
-    pickupDate: "2022-07-24",
-    status: "active",
-    pickupLocations: [{ address: "Ideal One Foresta", time: "10:00" }],
-    dropoffLocations: [{ address: "Lita Tyre", time: "11:00" }],
-  },
-];
-
 const Home: NextPage = () => {
+  const [rideOffers, setRideOffers] = useState<RideOffer[]>([]);
+
+  const fetchRideOffers = async () => {
+    const q = query(collection(firestore, "rideOffers"));
+    const querySnapshot = await getDocs(q);
+    const offers = querySnapshot.docs.map((doc) => {
+      return {
+        ...doc.data(),
+        id: doc.id,
+      } as RideOffer;
+    });
+    setRideOffers(offers);
+  };
+
+  useEffect(() => {
+    fetchRideOffers();
+  }, []);
+
   return (
     <div>
       <Head>
