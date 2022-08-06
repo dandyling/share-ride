@@ -19,7 +19,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       }
     });
     return unsubscribe;
-  }, []);
+  }, [router]);
   return (
     <NotificationsProvider position="top-center">
       <Component {...pageProps} />
