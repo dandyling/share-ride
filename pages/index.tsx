@@ -64,6 +64,7 @@ const Home: NextPage = () => {
             height={9}
             layout="responsive"
             objectFit="cover"
+            alt="Carpool Friends"
           />
           <div className="p-4 space-y-2">
             <Title order={1} className="text-ferra">
