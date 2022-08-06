@@ -3,6 +3,7 @@ import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 import { Layout } from "../components/layout";
@@ -10,19 +11,20 @@ import { auth } from "../firebase/firebase";
 import { EmailRegex, PasswordRegex } from "../utils.ts/regex";
 
 const SignUp: NextPage = () => {
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [touchedConfirm, setTouchedConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { onSubmit, getInputProps } = useForm({
     initialValues: {
-      username: "",
+      email: "",
       name: "",
       password,
       confirmPassword,
     },
     validate: {
-      username: (value) =>
+      email: (value) =>
         EmailRegex.test(value) ? null : "Please enter a valid email address",
       name: (value) => (value !== "" ? null : "Please enter your name"),
     },
@@ -35,11 +37,14 @@ const SignUp: NextPage = () => {
           const data = { ...values, password, confirmPassword };
           setIsSubmitting(true);
           try {
-            await createUserWithEmailAndPassword(
+            const user = await createUserWithEmailAndPassword(
               auth,
-              data.username,
+              data.email,
               data.password
             );
+            if (user) {
+              router.push("/");
+            }
             setIsSubmitting(false);
           } catch (error: any) {
             showNotification({
@@ -63,7 +68,7 @@ const SignUp: NextPage = () => {
             id="email-address"
             size="lg"
             placeholder="Email address"
-            {...getInputProps("username")}
+            {...getInputProps("email")}
           />
           <TextInput
             required
@@ -95,7 +100,7 @@ const SignUp: NextPage = () => {
               if (!touchedConfirm) {
                 setTouchedConfirm(true);
               }
-              setConfirmPassword(e.target.value);
+              setConfirmPassword(e.currentTarget.value);
             }}
             error={
               touchedConfirm && password !== confirmPassword
@@ -109,6 +114,7 @@ const SignUp: NextPage = () => {
             className="w-full bg-primary"
             rightIcon={<FaArrowRight className="text-sm" />}
             loading={isSubmitting}
+            disabled={isSubmitting}
             loaderPosition="right"
           >
             Sign Up
