@@ -47,7 +47,9 @@ export const Layout = ({ children }: { children: ReactNode }) => {
                 opened={opened}
                 onClick={() => setOpened((o) => !o)}
                 size="sm"
-                color={"#71717a"}
+                classNames={{
+                  burger: "bg-zinc-500 before:bg-zinc-500 after:bg-zinc-500",
+                }}
                 mr="xl"
               />
             </MediaQuery>
