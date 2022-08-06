@@ -25,10 +25,6 @@ const OfferRide: NextPage = () => {
     },
     validate: {
       pickupDate: (value) => (value ? null : "Invalid date"),
-      pickupLocations: (value) =>
-        value.length > 0 ? null : "Need at least one pickup location",
-      dropoffLocations: (value) =>
-        value.length > 0 ? null : "Need at least one dropoff location",
     },
   });
 
