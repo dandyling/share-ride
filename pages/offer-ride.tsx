@@ -161,7 +161,7 @@ const OfferRide: NextPage = () => {
             );
           })}
           <div className="flex justify-center">
-            <Button type="submit" size="lg" className=" bg-primary">
+            <Button type="submit" size="lg" className="bg-primary">
               Share ride
             </Button>
           </div>
