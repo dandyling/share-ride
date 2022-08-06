@@ -8,10 +8,12 @@ import {
   Navbar,
   Text,
 } from "@mantine/core";
+import { signOut } from "firebase/auth";
 import Link from "next/link";
 import { ReactNode, useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { TbSteeringWheel } from "react-icons/tb";
+import { auth } from "../firebase/firebase";
 
 export const Layout = ({ children }: { children: ReactNode }) => {
   const [opened, setOpened] = useState(false);
@@ -21,8 +23,17 @@ export const Layout = ({ children }: { children: ReactNode }) => {
       navbarOffsetBreakpoint="lg"
       fixed
       navbar={
-        <Navbar className="p-4 sm:w-72" hiddenBreakpoint="lg" hidden={!opened}>
-          <Text>Application Navbar</Text>
+        <Navbar className="sm:w-72" hiddenBreakpoint="lg" hidden={!opened}>
+          <Navbar.Section>
+            <div
+              className="w-full p-4 text-left text-stone-500"
+              onClick={async () => {
+                await signOut(auth);
+              }}
+            >
+              Logout
+            </div>
+          </Navbar.Section>
         </Navbar>
       }
       footer={
