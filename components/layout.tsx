@@ -13,6 +13,7 @@ import { AiOutlineCar, AiOutlineUser } from "react-icons/ai";
 import { FaCar } from "react-icons/fa";
 import { TbSteeringWheel } from "react-icons/tb";
 import { loadingAtom } from "../data/loading";
+import { auth } from "../firebase/firebase";
 
 export const Layout = ({ children }: { children: ReactNode }) => {
   const [loading] = useAtom(loadingAtom);
@@ -53,7 +54,9 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             <div className="flex items-center justify-start h-full max-w-4xl p-4 space-x-3">
               <FaCar className="text-2xl text-ferra" />
               <Text className="mt-1 text-ferra">
-                ShareRide - Share your ride with others
+                {auth.currentUser
+                  ? `Welcome, ${auth.currentUser.displayName}`
+                  : "ShareRide - Share your ride with others"}
               </Text>
             </div>
           </Link>
