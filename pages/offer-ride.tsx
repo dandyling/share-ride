@@ -1,41 +1,61 @@
 import { ActionIcon, Button, TextInput, Title } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { useForm } from "@mantine/form";
+import { showNotification } from "@mantine/notifications";
 import dayjs from "dayjs";
 import { addDoc, collection } from "firebase/firestore";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { Layout } from "../components/layout";
-import { firestore } from "../firebase/firebase";
+import { auth, firestore } from "../firebase/firebase";
 import { Location } from "./index";
+import { useAtom } from "jotai";
+import { loadingAtom } from "../data/loading";
 
 const OfferRide: NextPage = () => {
+  const [pickupDate, setPickupDate] = useState<Date | null>(dayjs().toDate());
   const [pickupLocations, setPickupLocations] = useState<Location[]>([
     { address: "", time: "" },
   ]);
   const [dropoffLocations, setDropoffLocations] = useState<Location[]>([
     { address: "", time: "" },
   ]);
-  const { onSubmit, getInputProps } = useForm({
-    initialValues: {
-      pickupDate: dayjs().toDate(),
-      pickupLocations,
-      dropoffLocations,
-    },
-    validate: {
-      pickupDate: (value) => (value ? null : "Invalid date"),
-    },
-  });
+  const { onSubmit } = useForm();
+  const [submitting, setSubmitting] = useState(false);
 
+  const router = useRouter();
   return (
     <Layout>
       <div className="p-4">
         <form
           className="space-y-4"
-          onSubmit={onSubmit(async (values) => {
-            const data = { ...values, pickupLocations, dropoffLocations };
-            await addDoc(collection(firestore, "rideOffers"), data);
+          onSubmit={onSubmit(async () => {
+            const data = {
+              pickupDate: pickupDate?.toISOString(),
+              pickupLocations,
+              dropoffLocations,
+            };
+            if (!auth.currentUser?.uid) {
+              router.push("/auth");
+            } else {
+              setSubmitting(true);
+              try {
+                await addDoc(collection(firestore, "rideOffers"), data);
+                setSubmitting(false);
+                router.push("/");
+              } catch (error: any) {
+                setSubmitting(false);
+                showNotification({
+                  title: "Error sharing ride",
+                  message: error.message,
+                  classNames: {
+                    root: "before:bg-red-500",
+                  },
+                });
+              }
+            }
           })}
         >
           <DatePicker
@@ -43,7 +63,8 @@ const OfferRide: NextPage = () => {
             label="Date"
             required
             size="lg"
-            {...getInputProps("pickupDate")}
+            value={pickupDate}
+            onChange={setPickupDate}
           />
           {pickupLocations.map((location, i) => {
             return (
@@ -157,7 +178,14 @@ const OfferRide: NextPage = () => {
             );
           })}
           <div className="flex justify-center">
-            <Button type="submit" size="lg" className="bg-primary">
+            <Button
+              loading={submitting}
+              disabled={submitting}
+              type="submit"
+              size="lg"
+              className="bg-primary"
+              loaderPosition="right"
+            >
               Share ride
             </Button>
           </div>

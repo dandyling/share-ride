@@ -6,16 +6,16 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
-import { Layout } from "../components/layout";
-import { auth } from "../firebase/firebase";
-import { EmailRegex, PasswordRegex } from "../utils.ts/regex";
+import { Layout } from "../../components/layout";
+import { auth } from "../../firebase/firebase";
+import { EmailRegex, PasswordRegex } from "../../utils.ts/regex";
 
 const SignUp: NextPage = () => {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [touchedConfirm, setTouchedConfirm] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const { onSubmit, getInputProps } = useForm({
     initialValues: {
       email: "",
@@ -35,7 +35,7 @@ const SignUp: NextPage = () => {
       <form
         onSubmit={onSubmit(async (values) => {
           const data = { ...values, password, confirmPassword };
-          setIsSubmitting(true);
+          setSubmitting(true);
           try {
             const user = await createUserWithEmailAndPassword(
               auth,
@@ -45,7 +45,7 @@ const SignUp: NextPage = () => {
             if (user) {
               router.push("/");
             }
-            setIsSubmitting(false);
+            setSubmitting(false);
           } catch (error: any) {
             showNotification({
               title: "Error creating user account",
@@ -54,10 +54,10 @@ const SignUp: NextPage = () => {
                 root: "before:bg-red-500",
               },
             });
-            setIsSubmitting(false);
+            setSubmitting(false);
           }
         })}
-        className="relative flex flex-col justify-between h-full px-8 py-16"
+        className="relative flex flex-col justify-center h-full p-16 space-y-16"
       >
         <Title order={1} className="self-center">
           Sign Up
@@ -108,19 +108,18 @@ const SignUp: NextPage = () => {
                 : ""
             }
           />
-          <Button
-            size="lg"
-            type="submit"
-            className="w-full bg-primary"
-            rightIcon={<FaArrowRight className="text-sm" />}
-            loading={isSubmitting}
-            disabled={isSubmitting}
-            loaderPosition="right"
-          >
-            Sign Up
-          </Button>
         </div>
-        <Button variant="white">Forgot Password</Button>
+        <Button
+          size="lg"
+          type="submit"
+          className="w-full rounded-2xl bg-primary"
+          rightIcon={<FaArrowRight className="text-sm" />}
+          loading={submitting}
+          disabled={submitting}
+          loaderPosition="right"
+        >
+          Sign Up
+        </Button>
       </form>
     </Layout>
   );

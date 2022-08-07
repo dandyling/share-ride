@@ -4,6 +4,7 @@ import {
   Burger,
   Footer,
   Header,
+  LoadingOverlay,
   MediaQuery,
   Navbar,
   Text,
@@ -14,21 +15,41 @@ import { ReactNode, useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { TbSteeringWheel } from "react-icons/tb";
 import { auth } from "../firebase/firebase";
+import { useAtom } from "jotai";
+import { loadingAtom } from "../data/loading";
+import { showNotification } from "@mantine/notifications";
 
 export const Layout = ({ children }: { children: ReactNode }) => {
   const [opened, setOpened] = useState(false);
+  const [loading, setLoading] = useAtom(loadingAtom);
   return (
     <AppShell
       padding={0}
       navbarOffsetBreakpoint="lg"
       fixed
+      classNames={{ body: "relative" }}
       navbar={
         <Navbar className="sm:w-72" hiddenBreakpoint="lg" hidden={!opened}>
           <Navbar.Section>
             <div
-              className="w-full p-4 text-left text-stone-500"
+              className="w-full p-4 text-left cursor-pointer text-stone-500"
               onClick={async () => {
-                await signOut(auth);
+                setLoading(true);
+                try {
+                  await signOut(auth);
+                  setLoading(false);
+                  setOpened(false);
+                } catch (error: any) {
+                  setLoading(false);
+                  setOpened(false);
+                  showNotification({
+                    title: "Sign out error",
+                    message: error.message,
+                    classNames: {
+                      root: "before:bg-red-500",
+                    },
+                  });
+                }
               }}
             >
               Logout
@@ -69,7 +90,10 @@ export const Layout = ({ children }: { children: ReactNode }) => {
         </Header>
       }
     >
-      {children}
+      <>
+        <LoadingOverlay visible={loading} />
+        {children}
+      </>
     </AppShell>
   );
 };

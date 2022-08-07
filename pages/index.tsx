@@ -61,14 +61,17 @@ const Home: NextPage = () => {
         <div className="flex flex-col h-full">
           {/* Next image width and height are ratios of the image dimensions.
           Use responsive in conjunction with cover */}
-          <Image
-            src="/carpool-friends.svg"
-            width={16}
-            height={9}
-            layout="responsive"
-            objectFit="cover"
-            alt="Carpool Friends"
-          />
+          <div>
+            <Image
+              src="/carpool-friends.svg"
+              width={16}
+              height={9}
+              layout="responsive"
+              objectFit="cover"
+              alt="Carpool Friends"
+              priority
+            />
+          </div>
           <div className="p-4 space-y-2">
             <Title order={1} className="text-ferra">
               Find a ride

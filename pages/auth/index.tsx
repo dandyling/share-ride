@@ -2,7 +2,7 @@ import { Button, Title, Text } from "@mantine/core";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { FaArrowRight } from "react-icons/fa";
-import { Layout } from "../components/layout";
+import { Layout } from "../../components/layout";
 import { AiFillCar } from "react-icons/ai";
 
 const SignUpOrLogin: NextPage = () => {
@@ -22,17 +22,17 @@ const SignUpOrLogin: NextPage = () => {
         <div className="flex flex-col items-center w-full space-y-4">
           <Button
             size="lg"
-            className="w-full bg-primary"
-            onClick={() => router.push("/signout")}
+            className="w-full rounded-2xl bg-primary"
+            onClick={() => router.push("/auth/sign-up")}
           >
             Sign Up
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="w-full text-primary border-primary"
+            className="w-full rounded-2xl text-primary border-primary"
             rightIcon={<FaArrowRight className="text-sm" />}
-            onClick={() => router.push("/login")}
+            onClick={() => router.push("/auth/login")}
           >
             Login
           </Button>

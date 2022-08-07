@@ -5,14 +5,15 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { AiFillCar } from "react-icons/ai";
 import { FaArrowRight } from "react-icons/fa";
-import { Layout } from "../components/layout";
-import { auth } from "../firebase/firebase";
-import { EmailRegex, PasswordRegex } from "../utils.ts/regex";
+import { Layout } from "../../components/layout";
+import { auth } from "../../firebase/firebase";
+import { EmailRegex, PasswordRegex } from "../../utils.ts/regex";
 
 const Login: NextPage = () => {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const { onSubmit, getInputProps } = useForm({
     initialValues: {
       email: "",
@@ -27,11 +28,12 @@ const Login: NextPage = () => {
           : "Password should consist of minimum eight characters, with at least one letter and one number:",
     },
   });
+
   return (
     <Layout>
       <form
         onSubmit={onSubmit(async (values) => {
-          setIsSubmitting(true);
+          setSubmitting(true);
           try {
             const user = await signInWithEmailAndPassword(
               auth,
@@ -41,7 +43,7 @@ const Login: NextPage = () => {
             if (user.user) {
               router.push("/");
             }
-            setIsSubmitting(false);
+            setSubmitting(false);
           } catch (error: any) {
             showNotification({
               title: "Error creating user account",
@@ -50,33 +52,38 @@ const Login: NextPage = () => {
                 root: "before:bg-red-500",
               },
             });
-            setIsSubmitting(false);
+            setSubmitting(false);
           }
         })}
-        className="flex flex-col justify-between h-full px-8 py-16"
+        className="flex flex-col justify-around h-full p-16 space-y-16"
       >
-        <Title order={1} className="self-center">
-          Login
-        </Title>
-        <div className="space-y-4">
-          <TextInput
-            id="email-address"
-            size="lg"
-            placeholder="Email address"
-            {...getInputProps("email")}
-          />
-          <PasswordInput
-            id="password"
-            placeholder="Password"
-            size="lg"
-            {...getInputProps("password")}
-          />
+        <div className="flex flex-col items-center space-y-8">
+          <div className="flex flex-col items-center w-full space-y-4">
+            <Title order={1}>Login</Title>
+            <AiFillCar className="my-4 text-9xl text-primary" />
+          </div>
+          <div className="flex flex-col w-full space-y-4">
+            <TextInput
+              id="email-address"
+              size="lg"
+              placeholder="Email address"
+              className="w-full"
+              {...getInputProps("email")}
+            />
+            <PasswordInput
+              id="password"
+              placeholder="Password"
+              size="lg"
+              className="w-full"
+              {...getInputProps("password")}
+            />
+          </div>
           <Button
             size="lg"
             type="submit"
-            className="w-full bg-primary"
-            loading={isSubmitting}
-            disabled={isSubmitting}
+            className="w-full rounded-2xl bg-primary"
+            loading={submitting}
+            disabled={submitting}
             loaderPosition={"right"}
             rightIcon={<FaArrowRight className="text-sm" />}
           >
