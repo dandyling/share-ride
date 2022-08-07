@@ -1,5 +1,5 @@
-import { ActionIcon, Button, TextInput, Title } from "@mantine/core";
-import { DatePicker } from "@mantine/dates";
+import { ActionIcon, Button, Title } from "@mantine/core";
+import { DatePicker, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
 import dayjs from "dayjs";
@@ -9,21 +9,43 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { Layout } from "../components/layout";
+import { PlacesInput } from "../components/places-input";
 import { Location } from "../components/ride-details";
 import { auth, firestore } from "../firebase/firebase";
 
 const OfferRide: NextPage = () => {
   const [pickupDate, setPickupDate] = useState<Date | null>(dayjs().toDate());
   const [pickupLocations, setPickupLocations] = useState<Location[]>([
-    { address: "", time: "" },
+    { address: "", time: dayjs().add(1, "hour").startOf("hour").toISOString() },
   ]);
   const [dropoffLocations, setDropoffLocations] = useState<Location[]>([
-    { address: "", time: "" },
+    { address: "", time: dayjs().add(2, "hour").startOf("hour").toISOString() },
   ]);
   const { onSubmit } = useForm();
   const [submitting, setSubmitting] = useState(false);
 
   const router = useRouter();
+
+  const handlePickupLocationChanges = (
+    prop: keyof Location,
+    index: number,
+    value: string
+  ) => {
+    const newPickupLocations = [...pickupLocations];
+    newPickupLocations[index][prop] = value;
+    setPickupLocations(newPickupLocations);
+  };
+
+  const handleDropoffLocationChanges = (
+    prop: keyof Location,
+    index: number,
+    value: string
+  ) => {
+    const newDropoffLocations = [...dropoffLocations];
+    newDropoffLocations[index][prop] = value;
+    setDropoffLocations(newDropoffLocations);
+  };
+
   return (
     <Layout>
       <div className="p-4">
@@ -71,24 +93,19 @@ const OfferRide: NextPage = () => {
                 <Title order={3} className="text-base font-semibold">{`Pickup ${
                   i + 1
                 }`}</Title>
-                <TextInput
-                  size="lg"
-                  placeholder="Pick Location"
+                <PlacesInput
                   value={location.address}
-                  onChange={(e) => {
-                    const newPickupLocations = [...pickupLocations];
-                    newPickupLocations[i].address = e.currentTarget.value;
-                    setPickupLocations(newPickupLocations);
+                  onChange={(value: string) => {
+                    handlePickupLocationChanges("address", i, value);
                   }}
                 />
-                <TextInput
+                <TimeInput
+                  required
                   size="lg"
-                  placeholder="Pick Time"
-                  value={location.time}
-                  onChange={(e) => {
-                    const newPickupLocations = [...pickupLocations];
-                    newPickupLocations[i].time = e.currentTarget.value;
-                    setPickupLocations(newPickupLocations);
+                  placeholder="Pickup Time"
+                  value={dayjs(location.time).toDate()}
+                  onChange={(value) => {
+                    handlePickupLocationChanges("time", i, value.toISOString());
                   }}
                 />
                 {i < pickupLocations.length - 1 && (
@@ -127,24 +144,23 @@ const OfferRide: NextPage = () => {
                   order={3}
                   className="text-base font-semibold"
                 >{`Dropoff ${i + 1}`}</Title>
-                <TextInput
-                  size="lg"
-                  placeholder="Dropoff Location"
+                <PlacesInput
                   value={location.address}
-                  onChange={(e) => {
-                    const newDropoffLocations = [...dropoffLocations];
-                    newDropoffLocations[i].address = e.currentTarget.value;
-                    setDropoffLocations(newDropoffLocations);
+                  onChange={(value: string) => {
+                    handleDropoffLocationChanges("address", i, value);
                   }}
                 />
-                <TextInput
+                <TimeInput
+                  required
                   size="lg"
                   placeholder="Dropoff Time"
-                  value={location.time}
-                  onChange={(e) => {
-                    const newDropoffLocations = [...dropoffLocations];
-                    newDropoffLocations[i].time = e.currentTarget.value;
-                    setDropoffLocations(newDropoffLocations);
+                  value={dayjs(location.time).toDate()}
+                  onChange={(value) => {
+                    handleDropoffLocationChanges(
+                      "time",
+                      i,
+                      value.toISOString()
+                    );
                   }}
                 />
                 {i < dropoffLocations.length - 1 && (

@@ -1,4 +1,5 @@
 import { Text, Title } from "@mantine/core";
+import dayjs from "dayjs";
 import md5 from "md5";
 
 export interface Location {
@@ -41,7 +42,9 @@ export const RideDetails = (props: RideDetailsProps) => {
             <Text className="text-lg font-medium">Pickup</Text>
             <div className="flex justify-between text-stone-500">
               <Text>{address}</Text>
-              <Text>{time}</Text>
+              <Text className="whitespace-nowrap">
+                {dayjs(time).format("h:mm a")}
+              </Text>
             </div>
           </div>
         );
@@ -53,7 +56,9 @@ export const RideDetails = (props: RideDetailsProps) => {
             <Text className="text-lg font-medium">Dropoff</Text>
             <div className="flex justify-between text-stone-500">
               <Text>{address}</Text>
-              <Text>{time}</Text>
+              <Text className="whitespace-nowrap">
+                {dayjs(time).format("h:mm a")}
+              </Text>
             </div>
           </div>
         );
