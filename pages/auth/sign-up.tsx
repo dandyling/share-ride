@@ -1,52 +1,72 @@
-import { Button, PasswordInput, TextInput, Title } from "@mantine/core";
+import { Button, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  ApplicationVerifier,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+} from "firebase/auth";
+import { useAtom } from "jotai";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
+import PhoneInput, {
+  Value as E164Number,
+} from "react-phone-number-input/input";
 import { Layout } from "../../components/layout";
+import {
+  confirmationResultAtom,
+  displayNameAtom,
+} from "../../data/phone-authentication";
 import { auth } from "../../firebase/firebase";
-import { EmailRegex, PasswordRegex } from "../../utils.ts/regex";
 
 const SignUp: NextPage = () => {
   const router = useRouter();
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [touchedConfirm, setTouchedConfirm] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState<E164Number>();
   const [submitting, setSubmitting] = useState(false);
+  const [recaptcha, setRecaptcha] = useState<RecaptchaVerifier>();
+  const [, setConfirmation] = useAtom(confirmationResultAtom);
+  const [, setDisplayName] = useAtom(displayNameAtom);
   const { onSubmit, getInputProps } = useForm({
     initialValues: {
-      email: "",
       name: "",
-      password,
-      confirmPassword,
     },
     validate: {
-      email: (value) =>
-        EmailRegex.test(value) ? null : "Please enter a valid email address",
       name: (value) => (value !== "" ? null : "Please enter your name"),
     },
   });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const recaptchaVerifier = new RecaptchaVerifier(
+        "submit-sign-up",
+        {
+          size: "invisible",
+        },
+        auth
+      );
+      setRecaptcha(recaptchaVerifier);
+    }
+  }, []);
 
   return (
     <Layout>
       <form
         onSubmit={onSubmit(async (values) => {
-          const data = { ...values, password, confirmPassword };
           setSubmitting(true);
           try {
-            const user = await createUserWithEmailAndPassword(
+            const confirmationResult = await signInWithPhoneNumber(
               auth,
-              data.email,
-              data.password
+              phoneNumber?.toString() ?? "",
+              recaptcha as ApplicationVerifier
             );
-            if (user) {
-              await updateProfile(user.user, { displayName: data.name });
-              router.push("/");
-            }
             setSubmitting(false);
+            if (confirmationResult) {
+              setConfirmation(confirmationResult);
+              setDisplayName(values.name);
+              router.push("/auth/verify");
+            }
           } catch (error: any) {
             showNotification({
               title: "Error creating user account",
@@ -64,53 +84,29 @@ const SignUp: NextPage = () => {
           Sign Up
         </Title>
         <div className="space-y-4">
-          <TextInput
+          <PhoneInput
+            label="Phone Number"
             required
-            id="email-address"
+            country="MY"
+            international
+            withCountryCallingCode
+            value={phoneNumber}
+            onChange={setPhoneNumber}
             size="lg"
-            placeholder="Email address"
-            {...getInputProps("email")}
+            placeholder="Enter phone number"
+            inputComponent={TextInput as any}
           />
           <TextInput
             required
+            label="Name"
             id="name"
             size="lg"
             placeholder="Name"
             {...getInputProps("name")}
           />
-          <PasswordInput
-            required
-            id="password"
-            placeholder="Password"
-            size="lg"
-            error={
-              PasswordRegex.test(password)
-                ? null
-                : "Password should consist of minimum eight characters, with at least one letter and one number:"
-            }
-            value={password}
-            onChange={(e) => setPassword(e.currentTarget.value)}
-          />
-          <PasswordInput
-            required
-            id="confirm-password"
-            placeholder="Confirm Password"
-            size="lg"
-            value={confirmPassword}
-            onChange={(e) => {
-              if (!touchedConfirm) {
-                setTouchedConfirm(true);
-              }
-              setConfirmPassword(e.currentTarget.value);
-            }}
-            error={
-              touchedConfirm && password !== confirmPassword
-                ? "Reconfirm password must match"
-                : ""
-            }
-          />
         </div>
         <Button
+          id="submit-sign-up"
           size="lg"
           type="submit"
           className="w-full rounded-2xl bg-primary"
@@ -119,7 +115,7 @@ const SignUp: NextPage = () => {
           disabled={submitting}
           loaderPosition="right"
         >
-          Sign Up
+          Next
         </Button>
       </form>
     </Layout>
