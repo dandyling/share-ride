@@ -83,7 +83,7 @@ const Home: NextPage = () => {
                   <Card className="py-8 space-y-2 border-t" key={rideOffer.id}>
                     <RideDetails rideOffer={rideOffer} />
                     <div className="flex justify-center">
-                      <Button size="lg" className="my-1 bg-primary">
+                      <Button size="lg" className="mt-6 bg-primary">
                         Message
                       </Button>
                     </div>
