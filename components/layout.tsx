@@ -39,6 +39,12 @@ export const Layout = ({ children }: { children: ReactNode }) => {
                   await signOut(auth);
                   setLoading(false);
                   setOpened(false);
+                  showNotification({
+                    message: "Sign out successfully",
+                    classNames: {
+                      root: "before:bg-green-500",
+                    },
+                  });
                 } catch (error: any) {
                   setLoading(false);
                   setOpened(false);
