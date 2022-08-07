@@ -61,6 +61,7 @@ const MyOfferedRides: NextPage = () => {
             <>
               {rideOffers.map((rideOffer) => (
                 <RideProfile
+                  key={rideOffer.id}
                   rideOffer={rideOffer}
                   onDelete={() => fetchRideOffers(false)}
                 />
