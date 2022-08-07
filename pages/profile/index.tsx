@@ -22,6 +22,7 @@ const Profile: NextPage = () => {
           root: "before:bg-green-500",
         },
       });
+      router.push("/auth");
     } catch (error: any) {
       setLoading(false);
       showNotification({

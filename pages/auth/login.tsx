@@ -46,7 +46,7 @@ const Login: NextPage = () => {
             setSubmitting(false);
           } catch (error: any) {
             showNotification({
-              title: "Error creating user account",
+              title: "Error signing in",
               message: error.message,
               classNames: {
                 root: "before:bg-red-500",
