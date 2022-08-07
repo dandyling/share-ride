@@ -1,46 +1,42 @@
-import { Button, Card, Text, Title } from "@mantine/core";
-import { query, collection, getDocs } from "firebase/firestore";
-import md5 from "md5";
+import { Button, Card, Loader, Text, Title } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
+import { collection, getDocs, query } from "firebase/firestore";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Layout } from "../components/layout";
+import { RideDetails, RideOffer } from "../components/ride-details";
 import { firestore } from "../firebase/firebase";
-
-export interface Location {
-  address: string;
-  time: string;
-}
-interface RideOffer {
-  id: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  photoUrl: string;
-  pickupDate: string;
-  status: "active" | "archived" | "paused";
-  pickupLocations: Location[];
-  dropoffLocations: Location[];
-  uid: string;
-  price?: number;
-  brand?: string;
-  model?: string;
-}
 
 const Home: NextPage = () => {
   const [rideOffers, setRideOffers] = useState<RideOffer[]>([]);
+  const [fetching, setFetching] = useState(false);
 
   const fetchRideOffers = async () => {
-    const q = query(collection(firestore, "rideOffers"));
-    const querySnapshot = await getDocs(q);
-    const offers = querySnapshot.docs.map((doc) => {
-      return {
-        ...doc.data(),
-        id: doc.id,
-      } as RideOffer;
-    });
-    setRideOffers(offers);
+    setFetching(true);
+    try {
+      const q = query(collection(firestore, "rideOffers"));
+      const querySnapshot = await getDocs(q);
+      const offers = querySnapshot.docs.map((doc) => {
+        return {
+          ...doc.data(),
+          id: doc.id,
+        } as RideOffer;
+      });
+      setFetching(false);
+      setRideOffers(offers);
+    } catch (error: any) {
+      setFetching(false);
+      showNotification({
+        title: "Fetch carpool error",
+        message: error.message,
+        classNames: {
+          root: "before:bg-red-500",
+        },
+      });
+      setRideOffers([]);
+    }
   };
 
   useEffect(() => {
@@ -80,46 +76,26 @@ const Home: NextPage = () => {
               Find a carpool by going through the list below
             </Text>
           </div>
-          <div className="flex flex-col">
-            {rideOffers.map((rideOffer) => {
-              const { name, pickupLocations, dropoffLocations, id } = rideOffer;
-              return (
-                <Card className="py-8 space-y-2 border-t-2" key={id}>
-                  <Title className="text-center text-ferra" order={3}>
-                    {name}
-                  </Title>
-                  {pickupLocations.map((location) => {
-                    const { address, time } = location;
-                    return (
-                      <div className="flex flex-col" key={md5(address + time)}>
-                        <Text className="text-lg font-medium">Pickup</Text>
-                        <div className="flex justify-between text-stone-500">
-                          <Text>{address}</Text>
-                          <Text>{time}</Text>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {dropoffLocations.map((location) => {
-                    const { address, time } = location;
-                    return (
-                      <div className="flex flex-col" key={md5(address + time)}>
-                        <Text className="text-lg font-medium">Dropoff</Text>
-                        <div className="flex justify-between text-stone-500">
-                          <Text>{address}</Text>
-                          <Text>{time}</Text>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <div className="flex justify-center">
-                    <Button size="lg" className="my-1 bg-primary">
-                      Message
-                    </Button>
-                  </div>
+          <div className="relative flex flex-col">
+            <>
+              {rideOffers.map((rideOffer) => {
+                return (
+                  <Card className="py-8 space-y-2 border-t" key={rideOffer.id}>
+                    <RideDetails rideOffer={rideOffer} />
+                    <div className="flex justify-center">
+                      <Button size="lg" className="my-1 bg-primary">
+                        Message
+                      </Button>
+                    </div>
+                  </Card>
+                );
+              })}
+              {fetching && (
+                <Card className="flex justify-center w-full py-16 space-y-2 border-t">
+                  <Loader />
                 </Card>
-              );
-            })}
+              )}
+            </>
           </div>
         </div>
       </Layout>

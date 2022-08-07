@@ -3,18 +3,21 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { auth } from "../firebase/firebase";
 
-export const useAuthenticationEffect = () => {
+export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const router = useRouter();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        router.push("/");
-      } else {
+      // https://firebase.google.com/docs/reference/js/firebase.User
+      if (!user) {
         router.push("/auth");
       }
     });
     return unsubscribe;
   }, [router]);
+
+  if (!auth.currentUser) {
+    return null;
+  } else {
+    return children;
+  }
 };

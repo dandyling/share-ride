@@ -16,6 +16,7 @@
     "@mantine/hooks": "^5.0.3",
     "@mantine/next": "^5.0.3",
     "@mantine/notifications": "^5.0.3",
+    "clsx": "^1.2.1",
     "dayjs": "^1.11.4",
     "firebase": "^9.9.2",
     "jotai": "^1.7.7",

@@ -5,7 +5,7 @@ import { FaArrowRight } from "react-icons/fa";
 import { Layout } from "../../components/layout";
 import { AiFillCar } from "react-icons/ai";
 
-const SignUpOrLogin: NextPage = () => {
+const IndexPage: NextPage = () => {
   const router = useRouter();
   return (
     <Layout>
@@ -42,4 +42,4 @@ const SignUpOrLogin: NextPage = () => {
   );
 };
 
-export default SignUpOrLogin;
+export default IndexPage;

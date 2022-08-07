@@ -9,10 +9,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { Layout } from "../components/layout";
+import { Location } from "../components/ride-details";
 import { auth, firestore } from "../firebase/firebase";
-import { Location } from "./index";
-import { useAtom } from "jotai";
-import { loadingAtom } from "../data/loading";
 
 const OfferRide: NextPage = () => {
   const [pickupDate, setPickupDate] = useState<Date | null>(dayjs().toDate());
@@ -32,14 +30,15 @@ const OfferRide: NextPage = () => {
         <form
           className="space-y-4"
           onSubmit={onSubmit(async () => {
-            const data = {
-              pickupDate: pickupDate?.toISOString(),
-              pickupLocations,
-              dropoffLocations,
-            };
             if (!auth.currentUser?.uid) {
               router.push("/auth");
             } else {
+              const data = {
+                uid: auth.currentUser.uid,
+                pickupDate: pickupDate?.toISOString(),
+                pickupLocations,
+                dropoffLocations,
+              };
               setSubmitting(true);
               try {
                 await addDoc(collection(firestore, "rideOffers"), data);
