@@ -21,38 +21,41 @@ export const Layout = ({ children }: { children: ReactNode }) => {
       padding={0}
       navbarOffsetBreakpoint="lg"
       fixed
-      classNames={{ body: "relative" }}
+      classNames={{
+        body: "flex w-full justify-center",
+        main: "relative max-w-4xl w-full h-full",
+      }}
       footer={
-        <Footer className="flex items-center justify-around p-4" height={64}>
-          <Link href="/">
-            <ActionIcon>
-              <AiOutlineCar className="text-2xl" />
-            </ActionIcon>
-          </Link>
-          <Link href="/offer-ride">
-            <ActionIcon>
-              <TbSteeringWheel className="text-2xl" />
-            </ActionIcon>
-          </Link>
-          <Link href="/profile">
-            <ActionIcon>
-              <AiOutlineUser className="text-2xl" />
-            </ActionIcon>
-          </Link>
+        <Footer className="flex justify-center p-4" height={64}>
+          <div className="flex items-center justify-around w-full max-w-4xl">
+            <Link href="/">
+              <ActionIcon>
+                <AiOutlineCar className="text-2xl" />
+              </ActionIcon>
+            </Link>
+            <Link href="/offer-ride">
+              <ActionIcon>
+                <TbSteeringWheel className="text-2xl" />
+              </ActionIcon>
+            </Link>
+            <Link href="/profile">
+              <ActionIcon>
+                <AiOutlineUser className="text-2xl" />
+              </ActionIcon>
+            </Link>
+          </div>
         </Footer>
       }
       header={
-        <Header height={72}>
-          <div className="flex items-center h-full p-4">
+        <Header height={72} className="flex justify-center w-full">
+          <div className="flex items-center h-full max-w-4xl p-4">
             <Text>ShareRide</Text>
           </div>
         </Header>
       }
     >
-      <>
-        <LoadingOverlay visible={loading} />
-        {children}
-      </>
+      <LoadingOverlay visible={loading} />
+      {children}
     </AppShell>
   );
 };

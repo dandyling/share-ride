@@ -68,7 +68,7 @@ const Home: NextPage = () => {
               priority
             />
           </div>
-          <div className="p-4 space-y-2">
+          <div className="p-4 space-y-2 border-b">
             <Title order={1} className="text-ferra">
               Find a ride
             </Title>
@@ -76,11 +76,14 @@ const Home: NextPage = () => {
               Find a carpool by going through the list below
             </Text>
           </div>
-          <div className="relative flex flex-col">
+          <div className="relative grid grid-cols-1 gap-px bg-gray-200 md:grid-cols-2">
             <>
               {rideOffers.map((rideOffer) => {
                 return (
-                  <Card className="py-8 space-y-2 border-t" key={rideOffer.id}>
+                  <Card
+                    className="py-8 space-y-2 rounded-none"
+                    key={rideOffer.id}
+                  >
                     <RideDetails rideOffer={rideOffer} />
                     <div className="flex justify-center">
                       <Button size="lg" className="mt-6 bg-primary">
@@ -90,13 +93,13 @@ const Home: NextPage = () => {
                   </Card>
                 );
               })}
-              {fetching && (
-                <Card className="flex justify-center w-full py-16 space-y-2 border-t">
-                  <Loader />
-                </Card>
-              )}
             </>
           </div>
+          {fetching && (
+            <Card className="flex justify-center w-full py-16 space-y-2 border-t">
+              <Loader />
+            </Card>
+          )}
         </div>
       </Layout>
     </div>
