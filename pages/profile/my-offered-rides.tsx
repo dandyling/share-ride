@@ -11,7 +11,7 @@ import { auth, firestore } from "../../firebase/firebase";
 
 const MyOfferedRides: NextPage = () => {
   const [rideOffers, setRideOffers] = useState<RideOffer[]>([]);
-  const [fetching, setFetching] = useState(false);
+  const [fetching, setFetching] = useState<boolean | undefined>();
 
   const fetchRideOffers = async (showLoading = true) => {
     if (auth.currentUser) {
@@ -53,7 +53,7 @@ const MyOfferedRides: NextPage = () => {
       <Layout>
         <div className="flex flex-col items-center w-full">
           <div className="w-full p-4 space-y-2">
-            <Title order={1} className="text-lg">
+            <Title order={1} className="text-base">
               My Offered Rides
             </Title>
           </div>
@@ -71,6 +71,13 @@ const MyOfferedRides: NextPage = () => {
                   <Loader />
                 </Card>
               )}
+              {rideOffers.length === 0 &&
+                fetching !== undefined &&
+                fetching !== true && (
+                  <div className="flex justify-center w-full py-16 text-center">
+                    <Title>No rides offered</Title>
+                  </div>
+                )}
             </>
           </div>
         </div>
