@@ -26,6 +26,12 @@ export const RideProfile = (props: RideProfileProps) => {
             try {
               await deleteDoc(doc(firestore, "rideOffers", rideOffer.id));
               await onDelete();
+              showNotification({
+                message: "Offer successfully deleted",
+                classNames: {
+                  root: "before:bg-green-500",
+                },
+              });
               setDeleting(false);
             } catch (error: any) {
               setDeleting(false);

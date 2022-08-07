@@ -46,7 +46,7 @@ const MyOfferedRides: NextPage = () => {
 
   useEffect(() => {
     fetchRideOffers();
-  }, [auth.currentUser]);
+  }, []);
 
   return (
     <ProtectedRoute>
