@@ -1,7 +1,7 @@
 import { Button, PasswordInput, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -43,6 +43,7 @@ const SignUp: NextPage = () => {
               data.password
             );
             if (user) {
+              await updateProfile(user.user, { displayName: data.name });
               router.push("/");
             }
             setSubmitting(false);

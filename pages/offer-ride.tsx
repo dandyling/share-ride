@@ -14,12 +14,14 @@ import { Location } from "../components/ride-details";
 import { auth, firestore } from "../firebase/firebase";
 
 const OfferRide: NextPage = () => {
-  const [pickupDate, setPickupDate] = useState<Date | null>(dayjs().toDate());
+  const [pickupDate, setPickupDate] = useState<Date | null>(
+    dayjs().startOf("day").toDate()
+  );
   const [pickupLocations, setPickupLocations] = useState<Location[]>([
-    { address: "", time: dayjs().add(1, "hour").startOf("hour").toISOString() },
+    { address: "", time: dayjs().add(1, "hour").startOf("hour").toDate() },
   ]);
   const [dropoffLocations, setDropoffLocations] = useState<Location[]>([
-    { address: "", time: dayjs().add(2, "hour").startOf("hour").toISOString() },
+    { address: "", time: dayjs().add(2, "hour").startOf("hour").toDate() },
   ]);
   const { onSubmit } = useForm();
   const [submitting, setSubmitting] = useState(false);
@@ -29,20 +31,28 @@ const OfferRide: NextPage = () => {
   const handlePickupLocationChanges = (
     prop: keyof Location,
     index: number,
-    value: string
+    value: string | Date
   ) => {
     const newPickupLocations = [...pickupLocations];
-    newPickupLocations[index][prop] = value;
+    if (prop === "address" && typeof value === "string") {
+      newPickupLocations[index][prop] = value;
+    } else if (prop === "time" && value instanceof Date) {
+      newPickupLocations[index][prop] = value;
+    }
     setPickupLocations(newPickupLocations);
   };
 
   const handleDropoffLocationChanges = (
     prop: keyof Location,
     index: number,
-    value: string
+    value: string | Date
   ) => {
     const newDropoffLocations = [...dropoffLocations];
-    newDropoffLocations[index][prop] = value;
+    if (prop === "address" && typeof value === "string") {
+      newDropoffLocations[index][prop] = value;
+    } else if (prop === "time" && value instanceof Date) {
+      newDropoffLocations[index][prop] = value;
+    }
     setDropoffLocations(newDropoffLocations);
   };
 
@@ -56,8 +66,9 @@ const OfferRide: NextPage = () => {
               router.push("/auth");
             } else {
               const data = {
+                name: auth.currentUser.displayName,
                 uid: auth.currentUser.uid,
-                pickupDate: pickupDate?.toISOString(),
+                pickupDate,
                 pickupLocations,
                 dropoffLocations,
               };
@@ -105,7 +116,7 @@ const OfferRide: NextPage = () => {
                   placeholder="Pickup Time"
                   value={dayjs(location.time).toDate()}
                   onChange={(value) => {
-                    handlePickupLocationChanges("time", i, value.toISOString());
+                    handlePickupLocationChanges("time", i, value);
                   }}
                 />
                 {i < pickupLocations.length - 1 && (
@@ -127,7 +138,12 @@ const OfferRide: NextPage = () => {
                     onClick={() => {
                       setPickupLocations([
                         ...pickupLocations,
-                        { address: "", time: "" },
+                        {
+                          address: "",
+                          time: dayjs(pickupLocations[i].time)
+                            .add(20, "minute")
+                            .toDate(),
+                        },
                       ]);
                     }}
                   >
@@ -156,11 +172,7 @@ const OfferRide: NextPage = () => {
                   placeholder="Dropoff Time"
                   value={dayjs(location.time).toDate()}
                   onChange={(value) => {
-                    handleDropoffLocationChanges(
-                      "time",
-                      i,
-                      value.toISOString()
-                    );
+                    handleDropoffLocationChanges("time", i, value);
                   }}
                 />
                 {i < dropoffLocations.length - 1 && (
@@ -182,7 +194,12 @@ const OfferRide: NextPage = () => {
                     onClick={() => {
                       setDropoffLocations([
                         ...dropoffLocations,
-                        { address: "", time: "" },
+                        {
+                          address: "",
+                          time: dayjs(dropoffLocations[i].time)
+                            .add(20, "minute")
+                            .toDate(),
+                        },
                       ]);
                     }}
                   >

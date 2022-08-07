@@ -10,6 +10,7 @@ import { useAtom } from "jotai";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { AiOutlineCar, AiOutlineUser } from "react-icons/ai";
+import { FaCar } from "react-icons/fa";
 import { TbSteeringWheel } from "react-icons/tb";
 import { loadingAtom } from "../data/loading";
 
@@ -47,10 +48,15 @@ export const Layout = ({ children }: { children: ReactNode }) => {
         </Footer>
       }
       header={
-        <Header height={72} className="flex justify-center w-full">
-          <div className="flex items-center h-full max-w-4xl p-4">
-            <Text>ShareRide</Text>
-          </div>
+        <Header height={72} className="flex justify-start w-full">
+          <Link href="/">
+            <div className="flex items-center justify-start h-full max-w-4xl p-4 space-x-3">
+              <FaCar className="text-2xl text-ferra" />
+              <Text className="mt-1 text-ferra">
+                ShareRide - Share your ride with others
+              </Text>
+            </div>
+          </Link>
         </Header>
       }
     >
