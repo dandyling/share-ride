@@ -30,7 +30,8 @@ export const TabBar = () => {
           <ActionIcon>
             <AiOutlineUser
               className={clsx("text-2xl", {
-                "text-ferra": pathname === "/profile",
+                "text-ferra":
+                  pathname === "/profile" || pathname.includes("/auth"),
               })}
             />
           </ActionIcon>

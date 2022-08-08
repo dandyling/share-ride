@@ -18,7 +18,7 @@ const Home: NextPage = () => {
     dayjs().startOf("day").toDate(),
     dayjs().add(1, "day").endOf("day").toDate(),
   ]);
-  const [fetching, setFetching] = useState(false);
+  const [fetching, setFetching] = useState<boolean>();
   const router = useRouter();
 
   const fetchRideOffers = async () => {
@@ -140,6 +140,13 @@ const Home: NextPage = () => {
               <Loader />
             </Card>
           )}
+          {rideOffers.length === 0 &&
+            fetching !== undefined &&
+            fetching !== true && (
+              <div className="flex justify-center w-full px-8 py-8 text-center text-neutral-400">
+                <Title order={2}>No carpool available at selected date</Title>
+              </div>
+            )}
         </div>
       </Layout>
     </div>
