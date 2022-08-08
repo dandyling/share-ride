@@ -129,7 +129,7 @@ export const RideDetails = (props: RideDetailsProps) => {
             Price:
           </span>
           <span className="mb-0 text-sm font-semibold text-center text-ferra">
-            Rs. {rideOffer.price}
+            {`Rs. ${rideOffer.price}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
           </span>
         </div>
       )}
