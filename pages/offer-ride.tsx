@@ -10,21 +10,25 @@ import { useState } from "react";
 import { FaMinusCircle, FaPlusCircle } from "react-icons/fa";
 import { Layout } from "../components/layout";
 import { PlacesInput } from "../components/places-input";
-import { Location } from "../components/ride-details";
+import { createLocation, Location } from "../components/ride-details";
 import { auth, firestore } from "../firebase/firebase";
 
 const MAX_SEATS = 10;
 const DEFAULT_AVAILABLE_SEATS = 3;
 
 const OfferRide: NextPage = () => {
-  const [pickupDate, setPickupDate] = useState<Date | null>(
+  const [pickupDatetime, setPickupDatetime] = useState<Date | null>(
     dayjs().startOf("day").toDate()
   );
   const [pickupLocations, setPickupLocations] = useState<Location[]>([
-    { address: "", time: dayjs().add(1, "hour").startOf("hour").toDate() },
+    createLocation({
+      datetime: dayjs().add(1, "hour").startOf("hour").toDate(),
+    }),
   ]);
   const [dropoffLocations, setDropoffLocations] = useState<Location[]>([
-    { address: "", time: dayjs().add(2, "hour").startOf("hour").toDate() },
+    createLocation({
+      datetime: dayjs().add(2, "hour").startOf("hour").toDate(),
+    }),
   ]);
   const [seats, setSeats] = useState<number | undefined>(
     DEFAULT_AVAILABLE_SEATS
@@ -42,9 +46,9 @@ const OfferRide: NextPage = () => {
     value: string | Date
   ) => {
     const newPickupLocations = [...pickupLocations];
-    if (prop === "address" && typeof value === "string") {
+    if (prop === "formatted_address" && typeof value === "string") {
       newPickupLocations[index][prop] = value;
-    } else if (prop === "time" && value instanceof Date) {
+    } else if (prop === "datetime" && value instanceof Date) {
       newPickupLocations[index][prop] = value;
     }
     setPickupLocations(newPickupLocations);
@@ -56,52 +60,69 @@ const OfferRide: NextPage = () => {
     value: string | Date
   ) => {
     const newDropoffLocations = [...dropoffLocations];
-    if (prop === "address" && typeof value === "string") {
+    if (prop === "formatted_address" && typeof value === "string") {
       newDropoffLocations[index][prop] = value;
-    } else if (prop === "time" && value instanceof Date) {
+    } else if (prop === "datetime" && value instanceof Date) {
       newDropoffLocations[index][prop] = value;
     }
     setDropoffLocations(newDropoffLocations);
   };
 
+  const handleSubmit = onSubmit(async () => {
+    if (!auth.currentUser?.uid) {
+      router.push("/auth");
+    } else {
+      const { displayName, uid, phoneNumber } = auth.currentUser;
+      const data = {
+        name: displayName,
+        uid,
+        phoneNumber,
+        pickupDatetime: getPickupDatetime(
+          pickupLocations[0].datetime,
+          pickupDatetime
+        ),
+        dropoffDatetime: getDropoffDatetime(
+          pickupLocations[pickupLocations.length - 1].datetime,
+          dropoffLocations[dropoffLocations.length - 1].datetime,
+          pickupDatetime
+        ),
+        pickupLocations: pickupLocations.map((location) => {
+          const datetime = getPickupDatetime(location.datetime, pickupDatetime);
+          return { ...location, datetime };
+        }),
+        dropoffLocations: dropoffLocations.map((location, i) => {
+          const datetime = getDropoffDatetime(
+            pickupLocations[i].datetime,
+            location.datetime,
+            pickupDatetime
+          );
+          return { ...location, datetime };
+        }),
+        price,
+        seatsAvailable: seats,
+      };
+      setSubmitting(true);
+      try {
+        await addDoc(collection(firestore, "rideOffers"), data);
+        setSubmitting(false);
+        router.push("/");
+      } catch (error: any) {
+        setSubmitting(false);
+        showNotification({
+          title: "Error sharing ride",
+          message: error.message,
+          classNames: {
+            root: "before:bg-red-500",
+          },
+        });
+      }
+    }
+  });
+
   return (
     <Layout>
       <div className="p-4">
-        <form
-          className="space-y-4"
-          onSubmit={onSubmit(async () => {
-            if (!auth.currentUser?.uid) {
-              router.push("/auth");
-            } else {
-              const { displayName, uid, phoneNumber } = auth.currentUser;
-              const data = {
-                name: displayName,
-                uid,
-                phoneNumber,
-                pickupDate,
-                pickupLocations,
-                dropoffLocations,
-                price,
-                seatsAvailable: seats,
-              };
-              setSubmitting(true);
-              try {
-                await addDoc(collection(firestore, "rideOffers"), data);
-                setSubmitting(false);
-                router.push("/");
-              } catch (error: any) {
-                setSubmitting(false);
-                showNotification({
-                  title: "Error sharing ride",
-                  message: error.message,
-                  classNames: {
-                    root: "before:bg-red-500",
-                  },
-                });
-              }
-            }
-          })}
-        >
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <Title
             order={1}
             className="text-2xl font-semibold text-center text-ferra"
@@ -114,8 +135,8 @@ const OfferRide: NextPage = () => {
             classNames={{ label: "text-sm" }}
             required
             size="lg"
-            value={pickupDate}
-            onChange={setPickupDate}
+            value={pickupDatetime}
+            onChange={setPickupDatetime}
           />
           <Title order={2} className="text-lg font-semibold text-center">
             Where will you pickup passengers and what time?
@@ -124,19 +145,27 @@ const OfferRide: NextPage = () => {
             return (
               <div className="flex flex-col space-y-4" key={i}>
                 <PlacesInput
-                  value={location.address}
-                  onChange={(value: string) => {
-                    handlePickupLocationChanges("address", i, value);
+                  value={location}
+                  onChange={(value: Location) => {
+                    const newPickupLocations = [...pickupLocations];
+                    newPickupLocations[i] = value;
+                    setPickupLocations(newPickupLocations);
                   }}
                 />
                 <TimeInput
                   required
                   size="lg"
+                  format="12"
                   placeholder="Pickup Time"
-                  value={dayjs(location.time).toDate()}
+                  value={dayjs(location.datetime).toDate()}
                   onChange={(value) => {
-                    handlePickupLocationChanges("time", i, value);
+                    handlePickupLocationChanges("datetime", i, value);
                   }}
+                  error={
+                    (isToday(location.datetime) &&
+                      dayjs(location.datetime).isBefore(dayjs())) ??
+                    "Time cannot be in the pass"
+                  }
                 />
                 {i < pickupLocations.length - 1 && (
                   <ActionIcon
@@ -157,12 +186,11 @@ const OfferRide: NextPage = () => {
                     onClick={() => {
                       setPickupLocations([
                         ...pickupLocations,
-                        {
-                          address: "",
-                          time: dayjs(pickupLocations[i].time)
+                        createLocation({
+                          datetime: dayjs(pickupLocations[i].datetime)
                             .add(20, "minute")
                             .toDate(),
-                        },
+                        }),
                       ]);
                     }}
                   >
@@ -179,19 +207,27 @@ const OfferRide: NextPage = () => {
             return (
               <div className="flex flex-col space-y-4" key={i}>
                 <PlacesInput
-                  value={location.address}
-                  onChange={(value: string) => {
-                    handleDropoffLocationChanges("address", i, value);
+                  value={location}
+                  onChange={(value: Location) => {
+                    const newDropoffLocations = [...dropoffLocations];
+                    newDropoffLocations[i] = value;
+                    setDropoffLocations(newDropoffLocations);
                   }}
                 />
                 <TimeInput
                   required
                   size="lg"
+                  format="12"
                   placeholder="Dropoff Time"
-                  value={dayjs(location.time).toDate()}
+                  value={dayjs(location.datetime).toDate()}
                   onChange={(value) => {
-                    handleDropoffLocationChanges("time", i, value);
+                    handleDropoffLocationChanges("datetime", i, value);
                   }}
+                  error={
+                    (isToday(location.datetime) &&
+                      dayjs(location.datetime).isBefore(dayjs())) ??
+                    "Time cannot be in the pass"
+                  }
                 />
                 {i < dropoffLocations.length - 1 && (
                   <ActionIcon
@@ -212,12 +248,11 @@ const OfferRide: NextPage = () => {
                     onClick={() => {
                       setDropoffLocations([
                         ...dropoffLocations,
-                        {
-                          address: "",
-                          time: dayjs(dropoffLocations[i].time)
+                        createLocation({
+                          datetime: dayjs(dropoffLocations[i].datetime)
                             .add(20, "minute")
                             .toDate(),
-                        },
+                        }),
                       ]);
                     }}
                   >
@@ -274,3 +309,37 @@ const OfferRide: NextPage = () => {
 };
 
 export default OfferRide;
+
+const getPickupDatetime = (time: Date, pickupDate: Date | null) => {
+  const hour = dayjs(time).hour();
+  const minute = dayjs(time).minute();
+  const datetime = dayjs(pickupDate)
+    .startOf("day")
+    .add(hour, "hour")
+    .add(minute, "minute")
+    .toDate();
+  return datetime;
+};
+
+const getDropoffDatetime = (
+  pickupTime: Date,
+  dropoffTime: Date,
+  pickupDate: Date | null
+) => {
+  const dropoffHour = dayjs(dropoffTime).hour();
+  const dropoffMinute = dayjs(dropoffTime).minute();
+  const datetime = dayjs(pickupDate)
+    .startOf("day")
+    .add(dropoffHour, "hour")
+    .add(dropoffMinute, "minute");
+  const pickupHour = dayjs(pickupTime).hour();
+  if (dropoffHour < pickupHour) {
+    return datetime.add(1, "day").toDate();
+  } else {
+    return datetime.toDate();
+  }
+};
+
+export const isToday = (date: Date) => {
+  return dayjs(date).isSame(dayjs(), "day");
+};

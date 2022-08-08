@@ -12,12 +12,13 @@ import { FaPhone, FaWhatsapp } from "react-icons/fa";
 import { Layout } from "../components/layout";
 import { RideDetails, RideOffer } from "../components/ride-details";
 import { firestore } from "../firebase/firebase";
+import { isToday } from "./offer-ride";
 
 const Home: NextPage = () => {
   const [rideOffers, setRideOffers] = useState<RideOffer[]>([]);
   const [dateRange, setDateRange] = useState<DateRangePickerValue>([
     dayjs().startOf("day").toDate(),
-    dayjs().add(1, "day").endOf("day").toDate(),
+    dayjs().add(1, "day").startOf("day").toDate(),
   ]);
   const [fetching, setFetching] = useState<boolean>();
   const router = useRouter();
@@ -28,8 +29,18 @@ const Home: NextPage = () => {
       try {
         const q = query(
           collection(firestore, "rideOffers"),
-          where("pickupDate", ">=", dateRange[0]),
-          where("pickupDate", "<", dayjs(dateRange[1]).endOf("day").toDate())
+          where(
+            "pickupDatetime",
+            ">=",
+            isToday(dateRange[0])
+              ? dayjs().toDate()
+              : dayjs(dateRange[0]).startOf("day").toDate()
+          ),
+          where(
+            "pickupDatetime",
+            "<",
+            dayjs(dateRange[1]).endOf("day").toDate()
+          )
         );
         const querySnapshot = await getDocs(q);
         const offers = querySnapshot.docs.map((doc) => {

@@ -4,9 +4,46 @@ import { Timestamp } from "firebase/firestore";
 import md5 from "md5";
 import { FaUser } from "react-icons/fa";
 
+export const createLocation = (params: Partial<Location>) => {
+  const {
+    formatted_address = "",
+    datetime = dayjs().toDate(),
+    address_components = [],
+    geometry = {
+      location: {
+        lat: 0,
+        lng: 0,
+      },
+    },
+    html_attributions = [],
+    place_id = "",
+  } = params;
+  return {
+    formatted_address,
+    datetime,
+    address_components,
+    geometry,
+    html_attributions,
+    place_id,
+  };
+};
+
 export interface Location {
-  address: string;
-  time: Date;
+  address_components: {
+    long_name: string;
+    short_name: string;
+    types: string[];
+  }[];
+  formatted_address: string;
+  datetime: Date;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  html_attributions: any[];
+  place_id: string;
 }
 
 export interface RideOffer {
@@ -15,7 +52,7 @@ export interface RideOffer {
   email: string;
   phoneNumber: string;
   photoUrl: string;
-  pickupDate: Date;
+  pickupDatetime: Date;
   status: "active" | "archived" | "paused";
   pickupLocations: Location[];
   dropoffLocations: Location[];
@@ -32,7 +69,7 @@ interface RideDetailsProps {
 
 export const RideDetails = (props: RideDetailsProps) => {
   const { rideOffer } = props;
-  const { pickupDate, pickupLocations, dropoffLocations, name } = rideOffer;
+  const { pickupDatetime, pickupLocations, dropoffLocations, name } = rideOffer;
   return (
     <>
       <div>
@@ -40,20 +77,20 @@ export const RideDetails = (props: RideDetailsProps) => {
           {name}
         </Title>
         <Title className="mb-0 text-sm text-center text-ferra" order={4}>
-          {dayjs((pickupDate as unknown as Timestamp).toDate()).format(
+          {dayjs((pickupDatetime as unknown as Timestamp).toDate()).format(
             "D MMM YYYY"
           )}
         </Title>
       </div>
       {pickupLocations.map((location, i) => {
-        const { address, time } = location;
+        const { formatted_address, datetime: time } = location;
         return (
-          <div className="flex flex-col" key={md5(address + time)}>
+          <div className="flex flex-col" key={md5(formatted_address + time)}>
             <Text className="text-base font-medium text-ferra">
               Pickup {i + 1}
             </Text>
             <div className="flex justify-between text-sm text-stone-500">
-              <Text>{address}</Text>
+              <Text>{formatted_address}</Text>
               <Text className="whitespace-nowrap">
                 {dayjs((time as unknown as Timestamp).toDate()).format(
                   "h:mm a"
@@ -64,14 +101,14 @@ export const RideDetails = (props: RideDetailsProps) => {
         );
       })}
       {dropoffLocations.map((location, i) => {
-        const { address, time } = location;
+        const { formatted_address, datetime: time } = location;
         return (
-          <div className="flex flex-col" key={md5(address + time)}>
+          <div className="flex flex-col" key={md5(formatted_address + time)}>
             <Text className="text-base font-medium text-ferra">
               Dropoff {i + 1}
             </Text>
             <div className="flex justify-between text-sm text-stone-500">
-              <Text>{address}</Text>
+              <Text>{formatted_address}</Text>
               <Text className="whitespace-nowrap">
                 {dayjs((time as unknown as Timestamp).toDate()).format(
                   "h:mm a"
@@ -82,8 +119,8 @@ export const RideDetails = (props: RideDetailsProps) => {
         );
       })}
       <div className="flex justify-center text-ferra">
-        {Array.from(Array(rideOffer.seatsAvailable).keys()).map(() => {
-          return <FaUser />;
+        {Array.from(Array(rideOffer.seatsAvailable).keys()).map((i) => {
+          return <FaUser key={i} />;
         })}
       </div>
       {rideOffer.price !== undefined && rideOffer.price > 0 && (
