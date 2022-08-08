@@ -79,6 +79,16 @@ export const RideDetails = (props: RideDetailsProps) => {
           </div>
         );
       })}
+      {rideOffer.price !== undefined && rideOffer.price > 0 && (
+        <div className="flex justify-center space-x-1">
+          <span className="mb-0 text-sm font-semibold text-center text-ferra">
+            Price:
+          </span>
+          <span className="mb-0 text-sm font-semibold text-center text-ferra">
+            Rs. {rideOffer.price}
+          </span>
+        </div>
+      )}
     </>
   );
 };

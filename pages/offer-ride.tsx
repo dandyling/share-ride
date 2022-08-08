@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Title } from "@mantine/core";
+import { ActionIcon, Button, NumberInput, Title } from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
@@ -23,6 +23,8 @@ const OfferRide: NextPage = () => {
   const [dropoffLocations, setDropoffLocations] = useState<Location[]>([
     { address: "", time: dayjs().add(2, "hour").startOf("hour").toDate() },
   ]);
+  const [price, setPrice] = useState<number | undefined>(0);
+
   const { onSubmit } = useForm();
   const [submitting, setSubmitting] = useState(false);
 
@@ -73,6 +75,7 @@ const OfferRide: NextPage = () => {
                 pickupDate,
                 pickupLocations,
                 dropoffLocations,
+                price,
               };
               setSubmitting(true);
               try {
@@ -92,20 +95,27 @@ const OfferRide: NextPage = () => {
             }
           })}
         >
+          <Title
+            order={1}
+            className="text-2xl font-semibold text-center text-ferra"
+          >
+            Offer a ride
+          </Title>
           <DatePicker
-            placeholder="Pick Date"
             label="Date"
+            placeholder="Pick Date"
+            classNames={{ label: "text-sm" }}
             required
             size="lg"
             value={pickupDate}
             onChange={setPickupDate}
           />
+          <Title order={2} className="text-lg font-semibold text-center">
+            Where will you pickup passengers and what time?
+          </Title>
           {pickupLocations.map((location, i) => {
             return (
               <div className="flex flex-col space-y-4" key={i}>
-                <Title order={3} className="text-base font-semibold">{`Pickup ${
-                  i + 1
-                }`}</Title>
                 <PlacesInput
                   value={location.address}
                   onChange={(value: string) => {
@@ -155,13 +165,12 @@ const OfferRide: NextPage = () => {
               </div>
             );
           })}
+          <Title order={2} className="text-lg font-semibold text-center">
+            Where will you dropoff passengers and around what time?
+          </Title>
           {dropoffLocations.map((location, i) => {
             return (
               <div className="flex flex-col space-y-4" key={i}>
-                <Title
-                  order={3}
-                  className="text-base font-semibold"
-                >{`Dropoff ${i + 1}`}</Title>
                 <PlacesInput
                   value={location.address}
                   onChange={(value: string) => {
@@ -211,6 +220,21 @@ const OfferRide: NextPage = () => {
               </div>
             );
           })}
+          <NumberInput
+            size="lg"
+            label="Price"
+            classNames={{ label: "text-sm" }}
+            value={price}
+            onChange={setPrice}
+            placeholder="Price"
+            hideControls
+            parser={(value) => value?.replace(/Rs. \s?|(,*)/g, "")}
+            formatter={(value) =>
+              value && !Number.isNaN(parseFloat(value))
+                ? `Rs. ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : "Rs. "
+            }
+          />
           <div className="flex justify-center">
             <Button
               loading={submitting}
