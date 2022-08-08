@@ -2,6 +2,7 @@ import { Text, Title } from "@mantine/core";
 import dayjs from "dayjs";
 import { Timestamp } from "firebase/firestore";
 import md5 from "md5";
+import { FaUser } from "react-icons/fa";
 
 export interface Location {
   address: string;
@@ -22,6 +23,7 @@ export interface RideOffer {
   price?: number;
   brand?: string;
   model?: string;
+  seatsAvailable: number;
 }
 
 interface RideDetailsProps {
@@ -79,6 +81,11 @@ export const RideDetails = (props: RideDetailsProps) => {
           </div>
         );
       })}
+      <div className="flex justify-center text-ferra">
+        {Array.from(Array(rideOffer.seatsAvailable).keys()).map(() => {
+          return <FaUser />;
+        })}
+      </div>
       {rideOffer.price !== undefined && rideOffer.price > 0 && (
         <div className="flex justify-center space-x-1">
           <span className="mb-0 text-sm font-semibold text-center text-ferra">

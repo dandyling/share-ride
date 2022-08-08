@@ -1,4 +1,4 @@
-import { ActionIcon, Button, NumberInput, Title } from "@mantine/core";
+import { ActionIcon, Button, NumberInput, Select, Title } from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
@@ -13,6 +13,9 @@ import { PlacesInput } from "../components/places-input";
 import { Location } from "../components/ride-details";
 import { auth, firestore } from "../firebase/firebase";
 
+const MAX_SEATS = 10;
+const DEFAULT_AVAILABLE_SEATS = 3;
+
 const OfferRide: NextPage = () => {
   const [pickupDate, setPickupDate] = useState<Date | null>(
     dayjs().startOf("day").toDate()
@@ -23,6 +26,9 @@ const OfferRide: NextPage = () => {
   const [dropoffLocations, setDropoffLocations] = useState<Location[]>([
     { address: "", time: dayjs().add(2, "hour").startOf("hour").toDate() },
   ]);
+  const [seats, setSeats] = useState<number | undefined>(
+    DEFAULT_AVAILABLE_SEATS
+  );
   const [price, setPrice] = useState<number | undefined>(0);
 
   const { onSubmit } = useForm();
@@ -76,6 +82,7 @@ const OfferRide: NextPage = () => {
                 pickupLocations,
                 dropoffLocations,
                 price,
+                seatsAvailable: seats,
               };
               setSubmitting(true);
               try {
@@ -220,9 +227,22 @@ const OfferRide: NextPage = () => {
               </div>
             );
           })}
+          <Select
+            required
+            label="Number of seats available"
+            placeholder="Number of seats"
+            classNames={{ label: "text-sm" }}
+            size="lg"
+            value={String(seats)}
+            onChange={(value) => setSeats(Number(value))}
+            data={Array.from(Array(MAX_SEATS).keys()).map((i) => ({
+              value: String(i + 1),
+              label: String(i + 1),
+            }))}
+          />
           <NumberInput
             size="lg"
-            label="Price"
+            label="Price per seat"
             classNames={{ label: "text-sm" }}
             value={price}
             onChange={setPrice}
