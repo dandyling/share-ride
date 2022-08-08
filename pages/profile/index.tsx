@@ -4,6 +4,7 @@ import { useAtom } from "jotai";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { Layout } from "../../components/layout";
+import { ProtectedRoute } from "../../components/protected-route";
 import { loadingAtom } from "../../data/loading";
 import { auth } from "../../firebase/firebase";
 
@@ -36,22 +37,24 @@ const Profile: NextPage = () => {
   };
 
   return (
-    <Layout>
-      <div className="flex flex-col items-center">
-        <div
-          className="w-full p-4 text-left border-b cursor-pointer text-stone-500"
-          onClick={() => router.push("/profile/my-offered-rides")}
-        >
-          My Offered Rides
+    <ProtectedRoute>
+      <Layout>
+        <div className="flex flex-col items-center">
+          <div
+            className="w-full p-4 text-left border-b cursor-pointer text-stone-500"
+            onClick={() => router.push("/profile/my-offered-rides")}
+          >
+            My Offered Rides
+          </div>
+          <div
+            className="w-full p-4 text-left border-b cursor-pointer text-stone-500"
+            onClick={handleSignOut}
+          >
+            Logout
+          </div>
         </div>
-        <div
-          className="w-full p-4 text-left border-b cursor-pointer text-stone-500"
-          onClick={handleSignOut}
-        >
-          Logout
-        </div>
-      </div>
-    </Layout>
+      </Layout>
+    </ProtectedRoute>
   );
 };
 
