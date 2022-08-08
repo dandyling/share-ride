@@ -9,11 +9,21 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       withNormalizeCSS
       withGlobalStyles
       theme={{
-        components: {
-          Button: {
-            classNames: { root: "focus:bg-yellow-500 active:bg-yellow-500" },
-          },
+        colors: {
+          primary: [
+            "#F8F7F2",
+            "#ECE5D2",
+            "#E5D7B0",
+            "#E5CD8C",
+            "#ECC863",
+            "#D8B655",
+            "#C3A44C",
+            "#AB9149",
+            "#917F4B",
+            "#7C6F4A",
+          ],
         },
+        primaryColor: "primary",
       }}
     >
       <NotificationsProvider position="top-center">
