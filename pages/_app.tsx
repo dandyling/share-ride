@@ -11,7 +11,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       theme={{
         components: {
           Button: {
-            classNames: { root: "focus:bg-accent" },
+            classNames: { root: "focus:bg-yellow-500 active:bg-yellow-500" },
           },
         },
       }}
