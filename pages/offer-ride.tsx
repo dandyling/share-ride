@@ -162,9 +162,10 @@ const OfferRide: NextPage = () => {
                     handlePickupLocationChanges("datetime", i, value);
                   }}
                   error={
-                    (isToday(location.datetime) &&
-                      dayjs(location.datetime).isBefore(dayjs())) ??
-                    "Time cannot be in the pass"
+                    isToday(location.datetime) &&
+                    dayjs(location.datetime).isBefore(dayjs())
+                      ? "Time cannot be in the pass"
+                      : null
                   }
                 />
                 {i < pickupLocations.length - 1 && (
@@ -224,9 +225,10 @@ const OfferRide: NextPage = () => {
                     handleDropoffLocationChanges("datetime", i, value);
                   }}
                   error={
-                    (isToday(location.datetime) &&
-                      dayjs(location.datetime).isBefore(dayjs())) ??
-                    "Time cannot be in the pass"
+                    isToday(location.datetime) &&
+                    dayjs(location.datetime).isBefore(dayjs())
+                      ? "Time cannot be in the pass"
+                      : null
                   }
                 />
                 {i < dropoffLocations.length - 1 && (
