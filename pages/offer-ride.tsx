@@ -65,9 +65,11 @@ const OfferRide: NextPage = () => {
             if (!auth.currentUser?.uid) {
               router.push("/auth");
             } else {
+              const { displayName, uid, phoneNumber } = auth.currentUser;
               const data = {
-                name: auth.currentUser.displayName,
-                uid: auth.currentUser.uid,
+                name: displayName,
+                uid,
+                phoneNumber,
                 pickupDate,
                 pickupLocations,
                 dropoffLocations,

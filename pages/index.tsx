@@ -1,4 +1,4 @@
-import { Button, Card, Loader, Text, Title } from "@mantine/core";
+import { ActionIcon, Button, Card, Loader, Text, Title } from "@mantine/core";
 import { DateRangePicker, DateRangePickerValue } from "@mantine/dates";
 import { showNotification } from "@mantine/notifications";
 import dayjs from "dayjs";
@@ -8,6 +8,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { FaPhone, FaWhatsapp } from "react-icons/fa";
 import { Layout } from "../components/layout";
 import { RideDetails, RideOffer } from "../components/ride-details";
 import { firestore } from "../firebase/firebase";
@@ -122,13 +123,32 @@ const Home: NextPage = () => {
             {rideOffers.map((rideOffer) => {
               return (
                 <Card
-                  className="py-8 space-y-2 rounded-none"
+                  className="py-8 space-y-6 rounded-none"
                   key={rideOffer.id}
                 >
-                  <RideDetails rideOffer={rideOffer} />
-                  <div className="flex justify-center">
-                    <Button size="lg" className="mt-6 bg-primary">
-                      Message
+                  <div className="space-y-2">
+                    <RideDetails rideOffer={rideOffer} />
+                  </div>
+                  <div className="flex items-center justify-center space-x-4">
+                    <ActionIcon
+                      size="lg"
+                      variant="filled"
+                      className="w-[50px] h-[50px] bg-primary"
+                      onClick={() => {
+                        window.open(`tel:${rideOffer.phoneNumber}`);
+                      }}
+                    >
+                      <FaPhone className="text-lg text-white" />
+                    </ActionIcon>
+                    <Button
+                      size="lg"
+                      className="bg-primary"
+                      leftIcon={<FaWhatsapp className="text-2xl" />}
+                      component="a"
+                      href={`https://wa.me/${rideOffer.phoneNumber}`}
+                      target="_blank"
+                    >
+                      WhatsApp
                     </Button>
                   </div>
                 </Card>
