@@ -73,7 +73,7 @@ const EnterPhoneNumber: NextPage = () => {
             label="Please enter your phone number:"
             classNames={{ label: "text-ferra mb-4", required: "hidden" }}
             required
-            country="MY"
+            country="LK"
             international
             withCountryCallingCode
             value={phoneNumber}
